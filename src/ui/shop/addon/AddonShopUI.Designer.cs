@@ -32,6 +32,7 @@ namespace MeteorInstaller.ui.shop.addon
         private void InitializeComponent()
         {
             this.addonList = new System.Windows.Forms.ListView();
+            this.test = new System.Windows.Forms.ColumnHeader();
             this.logBox = new System.Windows.Forms.RichTextBox();
             this.updateButton = new System.Windows.Forms.Button();
             this.scrapeGithub = new System.Windows.Forms.CheckBox();
@@ -42,15 +43,20 @@ namespace MeteorInstaller.ui.shop.addon
             // 
             this.addonList.Alignment = System.Windows.Forms.ListViewAlignment.Left;
             this.addonList.AutoArrange = false;
+            this.addonList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { this.test });
             this.addonList.Dock = System.Windows.Forms.DockStyle.Top;
             this.addonList.Location = new System.Drawing.Point(0, 0);
             this.addonList.Name = "addonList";
             this.addonList.Size = new System.Drawing.Size(512, 402);
             this.addonList.TabIndex = 0;
             this.addonList.UseCompatibleStateImageBehavior = false;
-            this.addonList.View = System.Windows.Forms.View.List;
+            this.addonList.View = System.Windows.Forms.View.Details;
             this.addonList.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.addonList_ItemSelectionChanged);
-            //this.addonList.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.addonList_ControlAdded);
+            // 
+            // test
+            // 
+            this.test.Text = "";
+            this.test.Width = 500;
             // 
             // logBox
             // 
@@ -109,6 +115,8 @@ namespace MeteorInstaller.ui.shop.addon
             this.Shown += new System.EventHandler(this.AddonShopUI_Shown);
             this.ResumeLayout(false);
         }
+
+        private System.Windows.Forms.ColumnHeader test;
 
         private System.Windows.Forms.CheckBox scrapeGithub;
         private System.Windows.Forms.CheckBox scrapeAntiCope;

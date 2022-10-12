@@ -66,7 +66,6 @@ namespace MeteorInstaller.ui.shop.addon
                 log("Loaded " + ShopCache.addonCache.Count + " addons from disk.");
                 loaded = true;
             }
-
             if (loaded) reloadShop();
             else MessageBox.Show("Unable to load the shop! Please try refreshing.");
 
@@ -76,11 +75,16 @@ namespace MeteorInstaller.ui.shop.addon
         {
             addonList.Items.Clear();
             addList(ShopCache.addonCache);
+            Task.Run(ShopCache.cacheAllIcons);
         }
         
-        private void AddonShopUI_FormClosing(object sender, FormClosingEventArgs e)
+        private async void AddonShopUI_FormClosing(object sender, FormClosingEventArgs e)
         {
-            ShopCache.saveToDisk();
+            await Task.Run(() =>
+            {
+                ShopCache.saveToDisk();
+                ShopCache.cacheAllIcons();
+            });
         }
 
         private void updateButton_Click(object sender, EventArgs e)

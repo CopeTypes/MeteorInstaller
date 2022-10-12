@@ -3,6 +3,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using MeteorInstaller.util;
 
 
@@ -25,10 +26,6 @@ namespace MeteorInstaller.ui.shop.addon
         {
             return authorName + "/" + name;
         }
-        
-        //public string icon { get; set; } // icon as base64 | todo impl
-        
-        //public Image icon { get; set; }
         
         public int downloads { get; set; }
 
@@ -63,6 +60,12 @@ namespace MeteorInstaller.ui.shop.addon
         public Image getIcon()
         {
             if (icon != null) return icon;
+            var cachedIcon = ShopCache.getCachedIcon(this);
+            if (cachedIcon != null)
+            {
+                icon = cachedIcon;
+                return icon;
+            }
             var client = new WebClient();
             client.Headers.Add("User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36");
@@ -72,6 +75,7 @@ namespace MeteorInstaller.ui.shop.addon
             ms.Close();
             Image properIcon = Utils.resizeImage(temp, new Size(64, 64));
             icon = properIcon;
+            Task.Run(() => ShopCache.cacheIcon(this));
             return icon;
         }
         
