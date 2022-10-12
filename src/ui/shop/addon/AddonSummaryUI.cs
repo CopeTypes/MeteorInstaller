@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -14,6 +15,9 @@ namespace MeteorInstaller.ui.shop.addon
     {
 
         private MeteorAddon _addon;
+
+        //private List<string> skids = new List<string> { "RedCarlos26", "Ethius", "RickyTheRacc" };
+        //private List<string> dontTrust = new List<string> { "Necropho", "Bennoo", "Kiriyaga" };
         
         
         public AddonSummaryUI(MeteorAddon addon)

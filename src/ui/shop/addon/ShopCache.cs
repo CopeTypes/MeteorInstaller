@@ -20,6 +20,50 @@ namespace MeteorInstaller.ui.shop.addon
         public static List<MeteorAddon> addonCache = new List<MeteorAddon>();
 
 
+        public static void organize()
+        {
+
+            try
+            {
+                // sort by known version
+                List<MeteorAddon> onRelVer = new List<MeteorAddon>();
+                List<MeteorAddon> onDevVer = new List<MeteorAddon>();
+                List<MeteorAddon> others = new List<MeteorAddon>();
+
+                foreach (var addon in addonCache)
+                {
+                    if (string.IsNullOrEmpty(addon.meteorVer))
+                    {
+                        others.Add(addon);
+                        continue;
+                    }
+                    if (addon.meteorVer.Contains("0.5.1")) onDevVer.Add(addon);
+                    else if (addon.meteorVer.Contains("0.5.0")) onRelVer.Add(addon);
+                    else others.Add(addon);
+                }
+
+                // order by download count
+                onRelVer = onRelVer.OrderBy(addon => addon.downloads).Reverse().ToList();
+                onDevVer = onDevVer.OrderBy(addon => addon.downloads).Reverse().ToList();
+                others = others.OrderBy(addon => addon.downloads).Reverse().ToList();
+
+                // order sub lists together
+                List<MeteorAddon> organized = new List<MeteorAddon>();
+                organized.AddRange(onDevVer);
+                organized.AddRange(onRelVer);
+                organized.AddRange(others);
+
+                addonCache = organized;
+            }
+            catch (Exception e)
+            {
+                //MessageBox.Show(e.Message);
+            }
+
+        }
+        
+        
+        
         public static void cacheAllIcons()
         {
             foreach (var addon in addonCache) cacheIcon(addon);
@@ -73,6 +117,7 @@ namespace MeteorInstaller.ui.shop.addon
                 var addons = JsonConvert.DeserializeObject<List<MeteorAddon>>(addonDB);
                 if (addons == null || addons.Count < 1) return false;
                 addonCache = addons;
+                organize();
                 return true;
             }
             catch (Exception e)
@@ -112,6 +157,7 @@ namespace MeteorInstaller.ui.shop.addon
         public static void addList(List<MeteorAddon> addons)
         {
             foreach (var addon in addons) addonCache.Add(addon);
+            organize();
         }
         
         

@@ -13,11 +13,11 @@ using MeteorInstaller.ui.installer;
 using MeteorInstaller.ui.shop.addon;
 using MeteorInstaller.util;
 
-namespace MeteorInstaller
+namespace MeteorInstaller.ui.main
 {
-    public partial class Form1 : Form
+    public partial class MainMenu : Form
     {
-        public Form1()
+        public MainMenu()
         {
             InitializeComponent();
             customFolder.Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".minecraft\\mods");
@@ -62,7 +62,10 @@ namespace MeteorInstaller
 
         private void Form1_Shown(object sender, EventArgs e)
         {
-            
+            if (!Config.load()) return;
+            customFolder.Visible = Config._config.customModDir;
+            customFolder.Text = Config._config.modFolderPath;
+            skipLauncherCheck.Checked = Config._config.skipLauncherCheck;
         }
 
         private void addonShop_Click(object sender, EventArgs e)
@@ -73,6 +76,17 @@ namespace MeteorInstaller
         private void launcherPick_Click(object sender, EventArgs e)
         {
             new LauncherPicker("Install a launcher").Show();
+        }
+
+        private async void MainMenu_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            await Task.Run(() =>
+            {
+                Config._config.customModDir = customDir.Checked;
+                Config._config.modFolderPath = customFolder.Text;
+                Config._config.skipLauncherCheck = skipLauncherCheck.Checked;
+                Config.save();
+            });
         }
     }
 }

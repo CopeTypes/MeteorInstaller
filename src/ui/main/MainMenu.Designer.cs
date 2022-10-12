@@ -1,6 +1,6 @@
-﻿namespace MeteorInstaller
+﻿namespace MeteorInstaller.ui.main
 {
-    partial class Form1
+    partial class MainMenu
     {
         /// <summary>
         /// Required designer variable.
@@ -126,7 +126,7 @@
             this.launcherPick.UseVisualStyleBackColor = true;
             this.launcherPick.Click += new System.EventHandler(this.launcherPick_Click);
             // 
-            // Form1
+            // MainMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -142,8 +142,9 @@
             this.Controls.Add(this.install_dev);
             this.Font = new System.Drawing.Font("Microsoft JhengHei UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Location = new System.Drawing.Point(15, 15);
-            this.Name = "Form1";
+            this.Name = "MainMenu";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainMenu_FormClosing);
             this.Shown += new System.EventHandler(this.Form1_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -62,12 +62,22 @@ namespace MeteorInstaller.ui.shop.addon
             bool loaded = false;
             if (ShopCache.loadFromDisk())
             {
-                //MessageBox.Show("loadFromDisk complete.");
                 log("Loaded " + ShopCache.addonCache.Count + " addons from disk.");
                 loaded = true;
             }
+
+            if (Config.load())
+            {
+                scrapeGithub.Checked = Config._config.scrapeGithub;
+                scrapeAntiCope.Checked = Config._config.scrapeAnticope;
+                if (!loaded)
+                {
+                    if (scrapeGithub.Checked) updateFromGithub();
+                    if (scrapeAntiCope.Checked) updateFromAntiCope();
+                }
+            }
             if (loaded) reloadShop();
-            else MessageBox.Show("Unable to load the shop! Please try refreshing.");
+            else MessageBox.Show("Unable to load the shop! Please try updating later.");
 
         }
 
@@ -82,6 +92,9 @@ namespace MeteorInstaller.ui.shop.addon
         {
             await Task.Run(() =>
             {
+                Config._config.scrapeGithub = scrapeGithub.Checked;
+                Config._config.scrapeAnticope = scrapeAntiCope.Checked;
+                Config.save();
                 ShopCache.saveToDisk();
                 ShopCache.cacheAllIcons();
             });

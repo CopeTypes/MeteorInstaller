@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MeteorInstaller.ui.main;
+using MainMenu = MeteorInstaller.ui.main.MainMenu;
 
 namespace MeteorInstaller
 {
@@ -16,7 +18,7 @@ namespace MeteorInstaller
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new MainMenu());
         }
     }
 }
