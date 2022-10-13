@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
+using MeteorInstaller.ui.shop.addon;
 
 namespace MeteorInstaller.util
 {
@@ -66,6 +68,16 @@ namespace MeteorInstaller.util
             return false;
         }
 
+
+        private static List<string> skids = new List<string> { "RedCarlos26", "Ethius", "RickyTheRacc" };
+        private static List<string> dontTrust = new List<string> { "Necropho", "Bennoo", "Kiriyaga" };
+        private static List<string> verifiedAuthors = new List<string>
+            { "AntiCope", "Cloudburst", "GhostTypes", "StormyBytes", "Declipsonator", "Wide_Cat" };
+        
+        public static bool shouldVerify(MeteorAddon addon)
+        {
+            return !addon.authors.Any(author => dontTrust.Contains(author)) && addon.authors.Any(author => verifiedAuthors.Contains(author));
+        }
         
         
         

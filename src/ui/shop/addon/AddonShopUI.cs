@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MeteorInstaller.util;
@@ -72,8 +73,8 @@ namespace MeteorInstaller.ui.shop.addon
                 scrapeAntiCope.Checked = Config._config.scrapeAnticope;
                 if (!loaded)
                 {
-                    if (scrapeGithub.Checked) updateFromGithub();
-                    if (scrapeAntiCope.Checked) updateFromAntiCope();
+                    if (scrapeAntiCope.Checked) loaded = updateFromAntiCope();
+                    if (scrapeGithub.Checked && !loaded) loaded = updateFromGithub();
                 }
             }
             if (loaded) reloadShop();
@@ -100,26 +101,30 @@ namespace MeteorInstaller.ui.shop.addon
             });
         }
 
+        private bool updating;
         private void updateButton_Click(object sender, EventArgs e)
         {
+            if (updating) return;
             Task.Run(() =>
             {
+                updating = true;
                 log("Saving database...");
                 ShopCache.saveToDisk();
-                if (scrapeGithub.Checked)
-                {
-                    log("Scraping from github...");
-                    if (updateFromGithub()) log("Success!");
-                }
                 if (scrapeAntiCope.Checked)
                 {
                     log("Scraping from anticope...");
                     if (updateFromAntiCope()) log("Success!");
                 }
+                if (scrapeGithub.Checked)
+                {
+                    log("Scraping from github...");
+                    if (updateFromGithub()) log("Success!");
+                }
                 log("Saving updated database...");
                 ShopCache.saveToDisk();
                 reloadShop();
                 log("Complete!");
+                updating = false;
             });
         }
 
@@ -160,6 +165,7 @@ namespace MeteorInstaller.ui.shop.addon
                 if (temp != null)
                 {
                     log("Found " + temp.Count + " new addons");
+                    foreach (var t in temp) t.verified = true;
                     addons.AddRange(temp);
                 }
 
@@ -185,6 +191,7 @@ namespace MeteorInstaller.ui.shop.addon
                 if (temp1 != null)
                 {
                     log("Found " + temp1.Count + " new addons.");
+                    foreach (var t in temp1) t.verified = false;
                     addons.AddRange(temp1);
                 }
 
@@ -244,7 +251,8 @@ namespace MeteorInstaller.ui.shop.addon
                         mcVer = mcVer.ToString(),
                         downloads = Int32.Parse(dlCount.ToString()),
                         description = summary.ToString(),
-                        iconUrl = icon.ToString()
+                        iconUrl = icon.ToString(),
+                        id = id.ToString()
                     };
 
                     //MessageBox.Show("addon init OK.");
@@ -264,6 +272,20 @@ namespace MeteorInstaller.ui.shop.addon
                         }
                     }
 
+                    //var verif = addon.verified;
+                    //if (addon.verif != null) addon.verified = verif;
+                    //else addon.verified = Utils.shouldVerify(_addon);
+
+                    var modules = addon.features;
+                    if (modules != null)
+                    { // get modules
+                        List<string> moduleL = new List<string>();
+                        foreach (var m in modules) moduleL.Add(m.ToString());
+                        _addon.modules = moduleL;
+                        _addon.moduleCount = moduleL.Count.ToString();
+                    }
+                    
+                    
                     var discord = links.discord; // check for discord link
                     if (discord != null) _addon.discordLink = discord.ToString();
 
@@ -285,6 +307,7 @@ namespace MeteorInstaller.ui.shop.addon
 
                     _addon.repoUrl = github.ToString();
                     _addon.downloadUrl = download.ToString();
+                    _addon.fileName = _addon.downloadUrl.Split('/').Last();
 
                     //MessageBox.Show("download link OK.");
 
@@ -292,7 +315,7 @@ namespace MeteorInstaller.ui.shop.addon
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show("Unable to parse anticope addon entry", e.Message);
+                    log("Error parsing anticope.ml addon entry\nException: " + e.Message);
                 }
             }
 
@@ -339,6 +362,12 @@ namespace MeteorInstaller.ui.shop.addon
                     if (name.EndsWith("-template")) continue;
                     
                     log("Checking " + name + " (" + repoUrl + ")");
+                    string id = authorName + "/" + name;
+                    if (ShopCache.isCached(id))
+                    {
+                        log("Already in database... skipping");
+                        continue;
+                    }
 
                     var release = GithubUtils.ghClient.Repository.Release.GetAll(authorName, name).GetAwaiter().GetResult()[0];
                     var downloadU = release.Url; // get the latest release
@@ -362,13 +391,14 @@ namespace MeteorInstaller.ui.shop.addon
                         name = name,
                         authorName = authorName,
                         repoUrl = repoUrl,
-                        downloads = -1
+                        downloads = -1,
+                        id = id
                     };
                     
                     foreach (var asset in release.Assets)
                     { // find the download url
                         log("Checking release asset (" + asset.Name + ")");
-                        if (asset.Name.Contains("-dev") || asset.Name.Contains("-sources")) continue;
+                        if (asset.Name.Contains("-dev") || asset.Name.Contains("-sources") || string.IsNullOrEmpty(asset.BrowserDownloadUrl)) continue;
                         addon.downloads = asset.DownloadCount;
                         addon.downloadUrl = asset.BrowserDownloadUrl;
                         addon.fileName = asset.Name;
@@ -404,7 +434,7 @@ namespace MeteorInstaller.ui.shop.addon
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show("Unable to parse github addon entry",e.ToString());
+                    MessageBox.Show(e.ToString(),"Unable to parse github addon entry");
                 }
             }
 
@@ -415,6 +445,8 @@ namespace MeteorInstaller.ui.shop.addon
         }
 
 
+        private readonly Regex moduleRegex = new Regex(@"(?:add\(new )([^(]+)(?:\([^)]*)\)\)");
+        
         private bool getExtraInfo(string repoAuthor, string repoName, string defaultBranch, WebClient client, MeteorAddon addon)
         {
             var propUrl = "https://raw.githubusercontent.com/" + repoAuthor + "/" + repoName + "/" + defaultBranch + "/gradle.properties";
@@ -424,41 +456,87 @@ namespace MeteorInstaller.ui.shop.addon
             {
                 string props = client.DownloadString(propUrl);
                 string fabric = client.DownloadString(fabricUrl);
-                
+
                 var fabricJson = JsonConvert.DeserializeObject<dynamic>(fabric); // get description
                 if (fabricJson == null)
                 {
                     log("No fabric.mod.json data, skipping...");
                     return false;
                 }
+
                 string desc = fabricJson.description;
                 if (string.IsNullOrEmpty(desc))
                 {
                     log("No description set, using default.");
                     desc = "No description";
                 }
+
                 addon.description = desc;
 
-                string icon = fabricJson.icon; // get icon
-                if (!string.IsNullOrEmpty(icon)) addon.iconUrl = "https://raw.githubusercontent.com/" + repoAuthor + "/" + repoName + "/" + defaultBranch + "/src/main/resources/" + icon;
+                log("Scanning for modules...");
+                var entrypoints = fabricJson.entrypoints; // get modules
+                if (entrypoints != null)
+                {
+                    // neither of these should ever be null but
+                    var epMeteor = entrypoints.meteor;
+                    if (epMeteor != null)
+                    {
+                        string ep = epMeteor[0].ToString();
+                        if (string.IsNullOrEmpty(ep)) log("Can't find entrypoint, skipping module scan.");
+                        else
+                        {
+                            try
+                            {
+                                var epUrl = "https://raw.githubusercontent.com/" + repoAuthor + "/" + repoName + "/" +
+                                            defaultBranch +
+                                            "/src/main/java/" + ep.Replace(".", "/") + ".java";
+                                var eps = client.DownloadString(epUrl);
+                                if (string.IsNullOrEmpty(eps)) log("Bad reply from github, skipping module scan.");
+                                else
+                                {
+                                    MatchCollection m = moduleRegex.Matches(eps);
+                                    if (m.Count > 0)
+                                    {
+                                        log("Got module list! Parsing and saving to entry...");
+                                        List<string> modules = (from Match mm in m select mm.Value).ToList();
+                                        addon.modules = new List<string>();
+                                        foreach (var mm in modules/*.Where(mm => !mm.Contains("Command"))*/) addon.modules.Add(mm.Replace("add(new ", "").Replace("())", ""));
+                                        addon.modules.Sort();
+                                        addon.moduleCount = addon.modules.Count.ToString();
+                                        log(addon.moduleCount + " modules saved to entry.");
+                                    }
+                                    else log("No modules found.");
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                log("Error scanning modules for " + repoName + "\nException: " + e.Message);
+                            }
+                        }
+                    }
+                }
+                else log("Mod entrypoint null for " + repoName + " (should never happen)");
+
                 
+                log("Parsing metadata...");
+                string icon = fabricJson.icon; // get icon
+                if (!string.IsNullOrEmpty(icon)) addon.iconUrl = "https://raw.githubusercontent.com/" + repoAuthor + "/" + repoName + "/" +
+                                                                 defaultBranch + "/src/main/resources/" + icon;
+                else log("No icon found");
+
                 var authors = new List<string>(); // get authors
                 foreach (var author in fabricJson.authors) authors.Add(author.ToString());
-
                 if (authors.Count < 1)
                 {
                     log("Unable to retrieve authors, using repo owner.");
-                    addon.authors = new List<string>{ addon.authorName };
+                    addon.authors = new List<string> { addon.authorName };
                 }
-                else
-                {
-                    addon.authors = authors;
-                }
+                else addon.authors = authors;
 
                 var contact = fabricJson.contact;
                 if (contact != null)
                 {
-                    var discordI = fabricJson.contact.discord;// get discord link (todo regex repo main page)
+                    var discordI = fabricJson.contact.discord; // get discord link (todo regex repo main page)
                     if (discordI == null)
                     {
                         log("No discord link in fabric.mod.json.");
@@ -473,12 +551,14 @@ namespace MeteorInstaller.ui.shop.addon
                         }
                     }
                 }
-                
-                string[] propd = props.Split(new []{'\n'}, StringSplitOptions.RemoveEmptyEntries);
+
+                string[] propd = props.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var s in propd) // get mc + meteor version
                 {
-                    if (s.StartsWith("minecraft_version")) addon.mcVer = s.Replace(" ", "").Replace("minecraft_version=", "");
-                    if (s.StartsWith("meteor_version")) addon.meteorVer = s.Replace(" ", "").Replace("meteor_version=", "");
+                    if (s.StartsWith("minecraft_version"))
+                        addon.mcVer = s.Replace(" ", "").Replace("minecraft_version=", "");
+                    if (s.StartsWith("meteor_version"))
+                        addon.meteorVer = s.Replace(" ", "").Replace("meteor_version=", "");
                 }
 
                 if (string.IsNullOrEmpty(addon.mcVer))
@@ -492,16 +572,21 @@ namespace MeteorInstaller.ui.shop.addon
                     log("Unable to detect Meteor version...");
                     addon.meteorVer = "???";
                 }
-                
+
             }
             catch (WebException e) when (e.Response is HttpWebResponse r)
-            { // skip if it doesn't have a gradle.properties or fabric.mod.json
+            {
+                // skip if it doesn't have a gradle.properties or fabric.mod.json
                 //MessageBox.Show("not found " + addon.name);
                 if (r.StatusCode == HttpStatusCode.NotFound)
                 {
                     log("Missing essential file (probably not an addon), skipping...");
                     return false;
                 }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
             }
 
             return true;

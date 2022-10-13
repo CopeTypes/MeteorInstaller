@@ -40,6 +40,7 @@ namespace MeteorInstaller.ui.shop.addon
                     if (addon.meteorVer.Contains("0.5.1")) onDevVer.Add(addon);
                     else if (addon.meteorVer.Contains("0.5.0")) onRelVer.Add(addon);
                     else others.Add(addon);
+                    addon.modules.Sort();
                 }
 
                 // order by download count
@@ -163,7 +164,7 @@ namespace MeteorInstaller.ui.shop.addon
         
         public static bool isCached(string id)
         {
-            return addonCache.Where(addon => !string.IsNullOrEmpty(addon.getId())).Any(addon => id.Equals(addon.getId()));
+            return addonCache.Where(addon => !string.IsNullOrEmpty(addon.id)).Any(addon => id.Equals(addon.id));
         }
         
     }

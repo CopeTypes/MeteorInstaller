@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Windows.Forms;
 using MeteorInstaller.util;
@@ -15,9 +16,6 @@ namespace MeteorInstaller.ui.shop.addon
     {
 
         private MeteorAddon _addon;
-
-        //private List<string> skids = new List<string> { "RedCarlos26", "Ethius", "RickyTheRacc" };
-        //private List<string> dontTrust = new List<string> { "Necropho", "Bennoo", "Kiriyaga" };
         
         
         public AddonSummaryUI(MeteorAddon addon)
@@ -44,6 +42,8 @@ namespace MeteorInstaller.ui.shop.addon
                 addonIcon.Image = properIcon;
                 addonIcon.Visible = true;
             }
+
+            addonModules.Text += _addon.moduleCount;
             Update();
         }
 
@@ -61,6 +61,27 @@ namespace MeteorInstaller.ui.shop.addon
         {
             if (!string.IsNullOrEmpty(_addon.discordLink)) Process.Start(new ProcessStartInfo(_addon.discordLink));
             else MessageBox.Show("No discord link available.");
+        }
+
+        private void viewModulesButton_Click(object sender, EventArgs e)
+        {
+            if (_addon.modules == null)
+            {
+                MessageBox.Show("No modules found for this addon. Try updating the shop or checking the Github repo.");
+                return;
+            }
+            var m = _addon.modules.Aggregate("", (current, module) => current + module + "\n");
+            MessageBox.Show(m, "Modules for " + _addon.name);
+        }
+
+        private void verifyButton_Click(object sender, EventArgs e)
+        {
+            if (_addon.verified) MessageBox.Show("This addon is safe to use!");
+            else if (Utils.shouldVerify(_addon))
+                MessageBox.Show("This addon hasn't been verified, but passed the automatic inspection.");
+            else
+                MessageBox.Show(
+                    "This addon hasn't been verified and failed the automatic inspection.\nProceed with caution.");
         }
     }
 }

@@ -33,14 +33,17 @@ namespace MeteorInstaller.ui.shop.addon
         {
             this.addonName = new System.Windows.Forms.Label();
             this.controlPanel = new System.Windows.Forms.Panel();
+            this.verifyButton = new System.Windows.Forms.Button();
+            this.viewModulesButton = new System.Windows.Forms.Button();
+            this.addonModules = new System.Windows.Forms.Label();
             this.discordButton = new System.Windows.Forms.Button();
             this.githubButton = new System.Windows.Forms.Button();
             this.addonDownloads = new System.Windows.Forms.Label();
+            this.addonDesc = new System.Windows.Forms.Label();
             this.installButton = new System.Windows.Forms.Button();
             this.addonAuthors = new System.Windows.Forms.Label();
             this.addonMeteorVer = new System.Windows.Forms.Label();
             this.addonMcVer = new System.Windows.Forms.Label();
-            this.addonDesc = new System.Windows.Forms.Label();
             this.addonIcon = new System.Windows.Forms.PictureBox();
             this.controlPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.addonIcon)).BeginInit();
@@ -51,7 +54,7 @@ namespace MeteorInstaller.ui.shop.addon
             this.addonName.Font = new System.Drawing.Font("Microsoft JhengHei UI", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.addonName.Location = new System.Drawing.Point(13, 38);
             this.addonName.Name = "addonName";
-            this.addonName.Size = new System.Drawing.Size(275, 51);
+            this.addonName.Size = new System.Drawing.Size(290, 51);
             this.addonName.TabIndex = 0;
             this.addonName.Text = "Addon Name";
             this.addonName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -59,6 +62,9 @@ namespace MeteorInstaller.ui.shop.addon
             // controlPanel
             // 
             this.controlPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.controlPanel.Controls.Add(this.verifyButton);
+            this.controlPanel.Controls.Add(this.viewModulesButton);
+            this.controlPanel.Controls.Add(this.addonModules);
             this.controlPanel.Controls.Add(this.discordButton);
             this.controlPanel.Controls.Add(this.githubButton);
             this.controlPanel.Controls.Add(this.addonDownloads);
@@ -72,6 +78,35 @@ namespace MeteorInstaller.ui.shop.addon
             this.controlPanel.Name = "controlPanel";
             this.controlPanel.Size = new System.Drawing.Size(485, 162);
             this.controlPanel.TabIndex = 1;
+            // 
+            // verifyButton
+            // 
+            this.verifyButton.Location = new System.Drawing.Point(231, 125);
+            this.verifyButton.Name = "verifyButton";
+            this.verifyButton.Size = new System.Drawing.Size(90, 24);
+            this.verifyButton.TabIndex = 10;
+            this.verifyButton.Text = "Verify";
+            this.verifyButton.UseVisualStyleBackColor = true;
+            this.verifyButton.Click += new System.EventHandler(this.verifyButton_Click);
+            // 
+            // viewModulesButton
+            // 
+            this.viewModulesButton.Location = new System.Drawing.Point(120, 125);
+            this.viewModulesButton.Name = "viewModulesButton";
+            this.viewModulesButton.Size = new System.Drawing.Size(90, 24);
+            this.viewModulesButton.TabIndex = 9;
+            this.viewModulesButton.Text = "View Modules";
+            this.viewModulesButton.UseVisualStyleBackColor = true;
+            this.viewModulesButton.Click += new System.EventHandler(this.viewModulesButton_Click);
+            // 
+            // addonModules
+            // 
+            this.addonModules.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.addonModules.Location = new System.Drawing.Point(12, 125);
+            this.addonModules.Name = "addonModules";
+            this.addonModules.Size = new System.Drawing.Size(102, 18);
+            this.addonModules.TabIndex = 8;
+            this.addonModules.Text = "Modules:";
             // 
             // discordButton
             // 
@@ -103,6 +138,14 @@ namespace MeteorInstaller.ui.shop.addon
             this.addonDownloads.Size = new System.Drawing.Size(291, 18);
             this.addonDownloads.TabIndex = 5;
             this.addonDownloads.Text = "Downloads: ";
+            // 
+            // addonDesc
+            // 
+            this.addonDesc.Font = new System.Drawing.Font("Microsoft JhengHei UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.addonDesc.Location = new System.Drawing.Point(11, 14);
+            this.addonDesc.Name = "addonDesc";
+            this.addonDesc.Size = new System.Drawing.Size(310, 31);
+            this.addonDesc.TabIndex = 0;
             // 
             // installButton
             // 
@@ -142,14 +185,6 @@ namespace MeteorInstaller.ui.shop.addon
             this.addonMcVer.TabIndex = 1;
             this.addonMcVer.Text = "MC Version: ";
             // 
-            // addonDesc
-            // 
-            this.addonDesc.Font = new System.Drawing.Font("Microsoft JhengHei UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.addonDesc.Location = new System.Drawing.Point(11, 14);
-            this.addonDesc.Name = "addonDesc";
-            this.addonDesc.Size = new System.Drawing.Size(310, 31);
-            this.addonDesc.TabIndex = 0;
-            // 
             // addonIcon
             // 
             this.addonIcon.Location = new System.Drawing.Point(339, 25);
@@ -174,6 +209,11 @@ namespace MeteorInstaller.ui.shop.addon
             ((System.ComponentModel.ISupportInitialize)(this.addonIcon)).EndInit();
             this.ResumeLayout(false);
         }
+
+        private System.Windows.Forms.Button viewModulesButton;
+
+        private System.Windows.Forms.Label addonModules;
+        private System.Windows.Forms.Button verifyButton;
 
         private System.Windows.Forms.PictureBox addonIcon;
 

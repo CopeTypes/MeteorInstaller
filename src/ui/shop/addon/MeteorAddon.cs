@@ -22,10 +22,7 @@ namespace MeteorInstaller.ui.shop.addon
         
         public string iconUrl { get; set; }
 
-        public string getId()
-        {
-            return authorName + "/" + name;
-        }
+        public string id { get; set; }
         
         public int downloads { get; set; }
 
@@ -42,7 +39,13 @@ namespace MeteorInstaller.ui.shop.addon
         public string meteorVer { get; set; }
         
         public List<string> authors { get; set; }
+        
+        public string moduleCount { get; set; }
+        
+        public List<string> modules { get; set; }
 
+        
+        public bool verified { get; set; }
         
         public string getAuthors()
         {
