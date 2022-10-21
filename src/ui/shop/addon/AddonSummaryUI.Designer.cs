@@ -52,9 +52,9 @@ namespace MeteorInstaller.ui.shop.addon
             // addonName
             // 
             this.addonName.Font = new System.Drawing.Font("Microsoft JhengHei UI", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.addonName.Location = new System.Drawing.Point(13, 38);
+            this.addonName.Location = new System.Drawing.Point(12, 25);
             this.addonName.Name = "addonName";
-            this.addonName.Size = new System.Drawing.Size(290, 51);
+            this.addonName.Size = new System.Drawing.Size(310, 51);
             this.addonName.TabIndex = 0;
             this.addonName.Text = "Addon Name";
             this.addonName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -81,7 +81,7 @@ namespace MeteorInstaller.ui.shop.addon
             // 
             // verifyButton
             // 
-            this.verifyButton.Location = new System.Drawing.Point(231, 125);
+            this.verifyButton.Location = new System.Drawing.Point(231, 122);
             this.verifyButton.Name = "verifyButton";
             this.verifyButton.Size = new System.Drawing.Size(90, 24);
             this.verifyButton.TabIndex = 10;
@@ -91,7 +91,7 @@ namespace MeteorInstaller.ui.shop.addon
             // 
             // viewModulesButton
             // 
-            this.viewModulesButton.Location = new System.Drawing.Point(120, 125);
+            this.viewModulesButton.Location = new System.Drawing.Point(119, 122);
             this.viewModulesButton.Name = "viewModulesButton";
             this.viewModulesButton.Size = new System.Drawing.Size(90, 24);
             this.viewModulesButton.TabIndex = 9;
@@ -102,7 +102,7 @@ namespace MeteorInstaller.ui.shop.addon
             // addonModules
             // 
             this.addonModules.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.addonModules.Location = new System.Drawing.Point(12, 125);
+            this.addonModules.Location = new System.Drawing.Point(11, 122);
             this.addonModules.Name = "addonModules";
             this.addonModules.Size = new System.Drawing.Size(102, 18);
             this.addonModules.TabIndex = 8;

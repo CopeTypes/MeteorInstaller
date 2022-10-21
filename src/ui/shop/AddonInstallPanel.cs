@@ -1,9 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Windows.Forms;
 using MeteorInstaller.ui.shop.addon;
+using MeteorInstaller.util;
 
 
 //UI for installing an addon
@@ -34,6 +36,23 @@ namespace MeteorInstaller.ui.shop
 
         private void AddonInstallPanel_Shown(object sender, EventArgs e)
         {
+            var outf = Path.Combine(_installFolder, _addon.fileName);
+            if (File.Exists(outf))
+            {
+                MessageBox.Show(_addon.name + " is already installed & up to date!");
+                return;
+            }
+            
+            var ii = Utils.getIncompatibles();
+            if (ii.Count > 0)
+            {
+                var m = "The following incompatible mods will be removed upon installation\n" +
+                        ii.Aggregate("", (current, i) => current + i + "\n");
+                MessageBox.Show(m, "Incompatible mods installed!");
+                Utils.deleteFiles(ii);
+            }
+            
+            removeOld();
             log("Installing " + _addon.name);
             
             if (string.IsNullOrEmpty(_addon.downloadUrl))
@@ -48,12 +67,25 @@ namespace MeteorInstaller.ui.shop
             client.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36");
             client.DownloadFileCompleted += DownloadComplete;
             client.DownloadProgressChanged += ProgressChanged;
-            var outf = Path.Combine(_installFolder, _addon.fileName);
             client.DownloadFileAsync(new Uri(_addon.downloadUrl), outf);
             
         }
 
-
+        private void removeOld()
+        {
+            var old = Directory.GetFiles(_installFolder, _addon.name.ToLower() + "*", SearchOption.TopDirectoryOnly);
+            foreach (var s in old)
+            {
+                try
+                {
+                    File.Delete(s);
+                }
+                catch (IOException)
+                { }
+                catch (UnauthorizedAccessException)
+                { }
+            }
+        }
 
 
 

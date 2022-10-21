@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Windows.Forms;
 using MeteorInstaller.util;
@@ -23,28 +24,13 @@ namespace MeteorInstaller.ui.installer
             InitializeComponent();
             downloadUrl = "https://meteorclient.com/download";
             if (devBuild) downloadUrl = "https://meteorclient.com/download?devBuild=latest";
-            log("Preparing to install...");
         }
 
 
         private void removeOld()
         {
             var old = Directory.GetFiles(installFolder, "meteor*", SearchOption.TopDirectoryOnly);
-            foreach (var s in old)
-            {
-                try
-                {
-                    File.Delete(s);
-                }
-                catch (IOException)
-                {
-                    log("Couldn't remove old meteor " + s);
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    log("Couldn't remove old meteor " + s);
-                }
-            }
+            Utils.deleteFiles(old);
         }
         
         private void ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
@@ -80,6 +66,17 @@ namespace MeteorInstaller.ui.installer
                 return;
             }*/
             //log("Detected java " + Utils.getJavaVer());
+            
+            log("Preparing to install...");
+
+            var ii = Utils.getIncompatibles();
+            if (ii.Count > 0)
+            {
+                var m = "The following incompatible mods will be removed upon installation\n" +
+                    ii.Aggregate("", (current, i) => current + i + "\n");
+                MessageBox.Show(m, "Incompatible mods installed!");
+                Utils.deleteFiles(ii);
+            }
             
             removeOld();
             

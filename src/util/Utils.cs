@@ -58,17 +58,73 @@ namespace MeteorInstaller.util
             return null;
         }
 
-
+        public static void deleteFiles(IEnumerable<string> files)
+        {
+            foreach (var s in files)
+            {
+                try
+                {
+                    File.Delete(s);
+                }
+                catch (IOException)
+                { }
+                catch (UnauthorizedAccessException)
+                { }
+            }
+        }
+        
+        
         public static bool launcherCheck()
         {
-            var t = Path.Combine(appdata, ".minecraft\\launcher_settings.json");
+            var t = Path.Combine(appdata, ".minecraft\\launcher_settings.json"); //unreliable, todo find a better way
             if (File.Exists(t)) return true;
             //todo somehow check for other launchers?
     
             return false;
         }
 
+        public static string fcu(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return null;
+            return input.First().ToString().ToUpper() + string.Join("", input.Skip(1));
+        }
+        
+        
+        public static List<string> getIncompatibles()
+        {
+            var modDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                ".minecraft\\mods");
+            if (Config._config.customModDir) modDir = Config._config.modFolderPath;
+            var incompatibles = new List<string>();
+            
+            
+            foreach (var i in incompatible)
+            { // i feel like this can be simplified, but it's good enough. 
+                var old1 = Directory.GetFiles(modDir, fcu(i) + "*", SearchOption.TopDirectoryOnly);
+                var old2 = Directory.GetFiles(modDir, i + "*", SearchOption.TopDirectoryOnly);
+                incompatibles.AddRange(old1);
+                incompatibles.AddRange(old2);
+            }
+            
+            return incompatibles.Distinct().ToList().Select(copE => copE.Split('\\').Last()).ToList(); //pog
 
+            //return incompatibles.Distinct().ToList();
+        }
+        
+        private static List<string> incompatible = new List<string>
+        {
+            "inertia",
+            "wurst",
+            "aristois",
+            "feather",
+            "optifine",
+            "optifabric",
+            "origins",
+            "better mount hud",
+            "armor chroma"
+        };
+        
+        
         private static List<string> skids = new List<string> { "RedCarlos26", "Ethius", "RickyTheRacc" };
         private static List<string> dontTrust = new List<string> { "Necropho", "Bennoo", "Kiriyaga" };
         private static List<string> verifiedAuthors = new List<string>

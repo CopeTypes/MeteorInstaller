@@ -25,9 +25,9 @@ namespace MeteorInstaller.ui.installer
             },
             new Launcher
             {
-                name = "PolyMC",
+                name = "Prism",
                 info = "An improved version of MultiMC",
-                downloadUrl = "https://github.com/PolyMC/PolyMC/releases/download/1.4.2/PolyMC-Windows-Setup-1.4.2.exe"
+                downloadUrl = "https://github.com/PrismLauncher/PrismLauncher/releases/download/5.0/PrismLauncher-Windows-Setup-5.0.exe"
             }
         };
         
