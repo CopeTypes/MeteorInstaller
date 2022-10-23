@@ -5,7 +5,9 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
+using System.Net;
 using MeteorInstaller.ui.shop.addon;
+using Newtonsoft.Json;
 
 namespace MeteorInstaller.util
 {
@@ -16,6 +18,31 @@ namespace MeteorInstaller.util
         public static readonly string localappdata =
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
+        
+        public static string releaseMc;
+        public static string releaseVer;
+        public static string devMc;
+        public static string devVer;
+
+        public static string changelog;
+
+
+        public static void setVers()
+        {
+            var api = new WebClient().DownloadString("https://meteorclient.com/api/stats");
+            var json = JsonConvert.DeserializeObject<dynamic>(api);
+            if (json == null) return;
+            releaseMc = json.mc_version.ToString();
+            releaseVer = json.version.ToString();
+            devMc = json.dev_build_mc_version.ToString();
+            devVer = json.devBuild.ToString();
+            
+            var cl = json.changelog;
+            changelog = "";
+            foreach (var change in cl) changelog += change + "\n";
+        }
+        
+        
         public static Process startProcess(string cmd)
         {
             
@@ -65,6 +92,21 @@ namespace MeteorInstaller.util
                 try
                 {
                     File.Delete(s);
+                }
+                catch (IOException)
+                { }
+                catch (UnauthorizedAccessException)
+                { }
+            }
+        }
+
+        public static void deleteFiles(IEnumerable<string> files, string root)
+        {
+            foreach (var s in files)
+            {
+                try
+                {
+                    File.Delete(Path.Combine(root, s));
                 }
                 catch (IOException)
                 { }

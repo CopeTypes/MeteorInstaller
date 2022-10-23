@@ -75,31 +75,30 @@ namespace MeteorInstaller.ui.installer
                 var m = "The following incompatible mods will be removed upon installation\n" +
                     ii.Aggregate("", (current, i) => current + i + "\n");
                 MessageBox.Show(m, "Incompatible mods installed!");
-                Utils.deleteFiles(ii);
+                Utils.deleteFiles(ii, installFolder);
             }
             
             removeOld();
             
-            var api = new WebClient().DownloadString("https://meteorclient.com/api/stats");
+            /*var api = new WebClient().DownloadString("https://meteorclient.com/api/stats");
             var json = JsonConvert.DeserializeObject<dynamic>(api);
 
             var meteorVer = json.version;
             var mcVer = json.mc_version;
             var devBuildVer = json.devBuild;
-            var devMcVer = json.dev_build_mc_version;
-
-
-
-            if (devBuild) log("Downloading Meteor dev build " + devBuildVer + " for Minecraft " + devMcVer);
-            else log("Downloading Meteor release " + meteorVer + " for Minecraft " + mcVer);
+            var devMcVer = json.dev_build_mc_version;*/
             
-            var changelog = json.changelog;
-            log("Changelog:");
-            foreach (var change in changelog) log(change.ToString());
+            
+            if (devBuild) log("Downloading Meteor dev build " + Utils.devVer + " for Minecraft " + Utils.devMc);
+            else log("Downloading Meteor release " + Utils.releaseVer + " for Minecraft " + Utils.releaseMc);
+            
+            //var changelog = json.changelog;
+            log("Changelog:\n" + Utils.changelog);
+            //foreach (var change in changelog) log(change.ToString());
             
             var client = new WebClient();
-            var mname = "meteor_client-" + meteorVer + ".jar";
-            if (devBuild) mname = "meteor_client_dev-" + devBuildVer + ".jar";
+            var mname = "meteor_client-" + Utils.releaseVer + ".jar";
+            if (devBuild) mname = "meteor_client_dev-" + Utils.devVer + ".jar";
             var outf = Path.Combine(installFolder, mname);
 
             client.DownloadFileCompleted += DownloadComplete;

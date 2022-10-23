@@ -88,5 +88,12 @@ namespace MeteorInstaller.ui.main
                 Config.save();
             });
         }
+
+        private void MainMenu_Load(object sender, EventArgs e)
+        {
+            Utils.setVers();
+            install_release.Text += " (" + Utils.releaseMc + ")";
+            install_dev.Text += " (" + Utils.devMc + ")";
+        }
     }
 }
