@@ -5,8 +5,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Windows.Forms;
-using MeteorInstaller.util;
-using Octokit;
 
 //UI for installing a launcher
 namespace MeteorInstaller.ui.installer

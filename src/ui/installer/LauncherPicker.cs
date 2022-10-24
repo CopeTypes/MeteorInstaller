@@ -10,7 +10,7 @@ namespace MeteorInstaller.ui.installer
     {
         
         private List<Launcher> _launchers = new List<Launcher>
-        {//todo replace download urls
+        {
             new Launcher
             {
                 name = "Microsoft",

@@ -14,10 +14,9 @@ namespace MeteorInstaller.util
     public class Utils
     {
         public static readonly string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-
-        public static readonly string localappdata =
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-
+        public static readonly string localappdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        public static readonly string logpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "latest.log");
+        
         
         public static string releaseMc;
         public static string releaseVer;
@@ -27,6 +26,13 @@ namespace MeteorInstaller.util
         public static string changelog;
 
 
+        public static async void sysLog(string s)
+        {
+            if (!File.Exists(logpath)) using (StreamWriter w = File.CreateText(logpath)) await w.WriteLineAsync("MeteorInstaller log");
+            else using (StreamWriter w2 = File.AppendText(logpath)) await w2.WriteLineAsync(s);
+        }
+        
+        
         public static void setVers()
         {
             var api = new WebClient().DownloadString("https://meteorclient.com/api/stats");

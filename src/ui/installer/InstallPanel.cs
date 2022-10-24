@@ -5,9 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Windows.Forms;
 using MeteorInstaller.util;
-using Newtonsoft.Json;
 
-//todo cleanup and match to other install panels (AddonInstall, JavaInstall, etc)
 namespace MeteorInstaller.ui.installer
 {
     public partial class InstallPanel : Form
@@ -25,8 +23,39 @@ namespace MeteorInstaller.ui.installer
             downloadUrl = "https://meteorclient.com/download";
             if (devBuild) downloadUrl = "https://meteorclient.com/download?devBuild=latest";
         }
+        
+        private void InstallPanel_Shown(object sender, EventArgs e)
+        {
+            
+            log("Preparing to install...");
 
+            var ii = Utils.getIncompatibles();
+            if (ii.Count > 0)
+            {
+                var m = "The following incompatible mods will be removed upon installation\n" +
+                    ii.Aggregate("", (current, i) => current + i + "\n");
+                MessageBox.Show(m, "Incompatible mods installed!");
+                Utils.deleteFiles(ii, installFolder);
+            }
+            
+            removeOld();
+            
+            if (devBuild) log("Downloading Meteor dev build " + Utils.devVer + " for Minecraft " + Utils.devMc);
+            else log("Downloading Meteor release " + Utils.releaseVer + " for Minecraft " + Utils.releaseMc);
+            log("Changelog:\n" + Utils.changelog);
 
+            var client = new WebClient();
+            var mname = "meteor_client-" + Utils.releaseVer + ".jar";
+            if (devBuild) mname = "meteor_client_dev-" + Utils.devVer + ".jar";
+            var outf = Path.Combine(installFolder, mname);
+
+            client.DownloadFileCompleted += DownloadComplete;
+            client.DownloadProgressChanged += ProgressChanged;
+            
+            //log("Saving to " + outf);
+            client.DownloadFileAsync(new Uri(downloadUrl), outf);
+        }
+        
         private void removeOld()
         {
             var old = Directory.GetFiles(installFolder, "meteor*", SearchOption.TopDirectoryOnly);
@@ -42,70 +71,12 @@ namespace MeteorInstaller.ui.installer
         {
             MessageBox.Show("Install complete!");
         }
-
-
-        /*private bool checkJava()
-        {
-            var javaVer = Utils.getJavaVer();
-            return !string.IsNullOrEmpty(javaVer);
-        }*/
         
         private void log(string s)
         {
             textbox.Text += s + "\n";
             textbox.SelectionStart = textbox.TextLength;
             textbox.ScrollToCaret();
-        }
-
-        private void InstallPanel_Shown(object sender, EventArgs e)
-        {
-
-            /*if (!checkJava())
-            {
-                log("Java is not installed.. preparing to install");
-                return;
-            }*/
-            //log("Detected java " + Utils.getJavaVer());
-            
-            log("Preparing to install...");
-
-            var ii = Utils.getIncompatibles();
-            if (ii.Count > 0)
-            {
-                var m = "The following incompatible mods will be removed upon installation\n" +
-                    ii.Aggregate("", (current, i) => current + i + "\n");
-                MessageBox.Show(m, "Incompatible mods installed!");
-                Utils.deleteFiles(ii, installFolder);
-            }
-            
-            removeOld();
-            
-            /*var api = new WebClient().DownloadString("https://meteorclient.com/api/stats");
-            var json = JsonConvert.DeserializeObject<dynamic>(api);
-
-            var meteorVer = json.version;
-            var mcVer = json.mc_version;
-            var devBuildVer = json.devBuild;
-            var devMcVer = json.dev_build_mc_version;*/
-            
-            
-            if (devBuild) log("Downloading Meteor dev build " + Utils.devVer + " for Minecraft " + Utils.devMc);
-            else log("Downloading Meteor release " + Utils.releaseVer + " for Minecraft " + Utils.releaseMc);
-            
-            //var changelog = json.changelog;
-            log("Changelog:\n" + Utils.changelog);
-            //foreach (var change in changelog) log(change.ToString());
-            
-            var client = new WebClient();
-            var mname = "meteor_client-" + Utils.releaseVer + ".jar";
-            if (devBuild) mname = "meteor_client_dev-" + Utils.devVer + ".jar";
-            var outf = Path.Combine(installFolder, mname);
-
-            client.DownloadFileCompleted += DownloadComplete;
-            client.DownloadProgressChanged += ProgressChanged;
-            
-            //log("Saving to " + outf);
-            client.DownloadFileAsync(new Uri(downloadUrl), outf);
         }
     }
 }

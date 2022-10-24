@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using MeteorInstaller.ui;
 using MeteorInstaller.ui.installer;
 using MeteorInstaller.ui.shop.addon;
 using MeteorInstaller.util;
@@ -20,7 +14,8 @@ namespace MeteorInstaller.ui.main
         public MainMenu()
         {
             InitializeComponent();
-            customFolder.Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".minecraft\\mods");
+            customFolder.Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                ".minecraft\\mods");
         }
 
         private void install_release_Click(object sender, EventArgs e)
@@ -40,8 +35,7 @@ namespace MeteorInstaller.ui.main
         {
             if (!Utils.javaCheck()) // make sure they have java
             {
-                MessageBox.Show("You don't have java installed, or the current version is too old.\n" +
-                                "Java 17 will be installed after pressing ok");
+                MessageBox.Show("You don't have java installed, or the current version is too old.\n" + "Java 17 will be installed after pressing ok");
                 new JavaInstallPanel().Show();
                 return false;
             }
@@ -51,8 +45,8 @@ namespace MeteorInstaller.ui.main
             new LauncherPicker().Show();
             return false;
         }
-        
-        
+
+
         private void customDir_CheckedChanged(object sender, EventArgs e)
         {
             customFolder.Visible = customDir.Checked;
@@ -82,10 +76,12 @@ namespace MeteorInstaller.ui.main
         {
             await Task.Run(() =>
             {
+                Utils.sysLog("Shutting down...");
                 Config._config.customModDir = customDir.Checked;
                 Config._config.modFolderPath = customFolder.Text;
                 Config._config.skipLauncherCheck = skipLauncherCheck.Checked;
                 Config.save();
+                Utils.sysLog("Config saved! Goodbye.");
             });
         }
 

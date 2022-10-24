@@ -40,18 +40,16 @@ namespace MeteorInstaller.ui.installer
             this.textbox.Dock = System.Windows.Forms.DockStyle.Top;
             this.textbox.Location = new System.Drawing.Point(0, 0);
             this.textbox.Name = "textbox";
-            this.textbox.ReadOnly = true;
-            this.textbox.Size = new System.Drawing.Size(533, 312);
+            this.textbox.Size = new System.Drawing.Size(406, 287);
             this.textbox.TabIndex = 0;
             this.textbox.Text = "";
             // 
             // progress_bar
             // 
             this.progress_bar.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.progress_bar.Location = new System.Drawing.Point(0, 158);
+            this.progress_bar.Location = new System.Drawing.Point(0, 293);
             this.progress_bar.Name = "progress_bar";
-            this.progress_bar.Size = new System.Drawing.Size(533, 23);
-            this.progress_bar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progress_bar.Size = new System.Drawing.Size(406, 29);
             this.progress_bar.TabIndex = 1;
             // 
             // InstallPanel
@@ -60,7 +58,7 @@ namespace MeteorInstaller.ui.installer
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(533, 181);
+            this.ClientSize = new System.Drawing.Size(406, 322);
             this.Controls.Add(this.progress_bar);
             this.Controls.Add(this.textbox);
             this.Location = new System.Drawing.Point(15, 15);
@@ -74,6 +72,7 @@ namespace MeteorInstaller.ui.installer
         private System.Windows.Forms.ProgressBar progress_bar;
 
         private System.Windows.Forms.RichTextBox textbox;
+        
 
         #endregion
     }

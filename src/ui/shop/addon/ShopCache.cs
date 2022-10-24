@@ -20,47 +20,24 @@ namespace MeteorInstaller.ui.shop.addon
         public static List<MeteorAddon> addonCache = new List<MeteorAddon>();
 
 
-        public static void organize()
+        private static void organize()
         {
-
-            try
+            //todo rewrite
+            List<MeteorAddon> latest = new List<MeteorAddon>();
+            List<MeteorAddon> others = new List<MeteorAddon>();
+            foreach (var addon in addonCache)
             {
-                // sort by known version
-                List<MeteorAddon> onRelVer = new List<MeteorAddon>();
-                List<MeteorAddon> onDevVer = new List<MeteorAddon>();
-                List<MeteorAddon> others = new List<MeteorAddon>();
-
-                foreach (var addon in addonCache)
-                {
-                    if (string.IsNullOrEmpty(addon.meteorVer))
-                    {
-                        others.Add(addon);
-                        continue;
-                    }
-                    if (addon.meteorVer.Contains("0.5.1")) onDevVer.Add(addon);
-                    else if (addon.meteorVer.Contains("0.5.0")) onRelVer.Add(addon);
-                    else others.Add(addon);
-                    addon.modules.Sort();
-                }
-
-                // order by download count
-                onRelVer = onRelVer.OrderBy(addon => addon.downloads).Reverse().ToList();
-                onDevVer = onDevVer.OrderBy(addon => addon.downloads).Reverse().ToList();
-                others = others.OrderBy(addon => addon.downloads).Reverse().ToList();
-
-                // order sub lists together
-                List<MeteorAddon> organized = new List<MeteorAddon>();
-                organized.AddRange(onDevVer);
-                organized.AddRange(onRelVer);
-                organized.AddRange(others);
-
-                addonCache = organized;
+                if (addon.mcVer == null) others.Add(addon);
+                else if (addon.mcVer.Contains("1.19.2")) latest.Add(addon);
+                if (addon.meteorVer == null) others.Add(addon);
+                else if (addon.meteorVer.Contains("0.5.1")) latest.Add(addon);
             }
-            catch (Exception e)
-            {
-                //MessageBox.Show(e.Message);
-            }
-
+            
+            List<MeteorAddon> organized = new List<MeteorAddon>();
+            organized.AddRange(latest.OrderBy(addon => addon.downloads).Reverse().ToList());
+            organized.AddRange(others.OrderBy(addon => addon.downloads).Reverse().ToList());
+            addonCache.Clear();
+            addonCache.AddRange(organized.Distinct());
         }
         
         

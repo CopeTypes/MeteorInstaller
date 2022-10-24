@@ -11,8 +11,7 @@ namespace MeteorInstaller.ui.installer
     {
 
         //todo not hardcode?
-        private readonly string _dlUrl =
-            "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.4.1%2B1/OpenJDK17U-jre_x64_windows_hotspot_17.0.4.1_1.msi";
+        private readonly string _dlUrl = "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.4.1%2B1/OpenJDK17U-jre_x64_windows_hotspot_17.0.4.1_1.msi";
         
         public JavaInstallPanel()
         {

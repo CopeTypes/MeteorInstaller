@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -86,18 +87,22 @@ namespace MeteorInstaller.ui.shop.addon
         {
             addonList.Items.Clear();
             addList(ShopCache.addonCache);
-            Task.Run(ShopCache.cacheAllIcons);
+            //Task.Run(ShopCache.cacheAllIcons);
         }
         
         private async void AddonShopUI_FormClosing(object sender, FormClosingEventArgs e)
         {
             await Task.Run(() =>
             {
+                var s = new Stopwatch();
+                s.Start();
+                Utils.sysLog("Saving everything before the addon shop closes");
                 Config._config.scrapeGithub = scrapeGithub.Checked;
                 Config._config.scrapeAnticope = scrapeAntiCope.Checked;
                 Config.save();
                 ShopCache.saveToDisk();
-                ShopCache.cacheAllIcons();
+                //ShopCache.cacheAllIcons();
+                Utils.sysLog("Done in " + s.ElapsedMilliseconds + "ms");
             });
         }
 
@@ -224,10 +229,7 @@ namespace MeteorInstaller.ui.shop.addon
                     var name = addon.name;
                     var summary = addon.summary;
 
-                    if (authors == null || icon == null || links == null || mcVer == null || dlCount == null ||
-                        name == null || summary == null || id == null) continue; // skip 
-
-                    //MessageBox.Show(id.ToString());
+                    if (authors == null || icon == null || links == null || mcVer == null || dlCount == null || name == null || summary == null || id == null) continue;
                     log("Checking " + name.ToString());
 
                     if (name.ToString().Equals("Addon Template")
@@ -254,15 +256,12 @@ namespace MeteorInstaller.ui.shop.addon
                         iconUrl = icon.ToString(),
                         id = id.ToString()
                     };
-
-                    //MessageBox.Show("addon init OK.");
+                    
                     // check for the rest
-
                     List<string> _authors = new List<string>();
                     foreach (var author in authors) _authors.Add(author.ToString()); // set authors
                     _addon.authors = _authors;
-                    //MessageBox.Show("authors OK.");
-                    
+
                     if (_authors.Count > 2)
                     { // addon template check
                         if (_authors[0].Equals("seasnail") || _authors[0].Equals("seasnail8169"))
@@ -271,11 +270,7 @@ namespace MeteorInstaller.ui.shop.addon
                             continue;
                         }
                     }
-
-                    //var verif = addon.verified;
-                    //if (addon.verif != null) addon.verified = verif;
-                    //else addon.verified = Utils.shouldVerify(_addon);
-
+                    
                     var modules = addon.features;
                     if (modules != null)
                     { // get modules
@@ -288,8 +283,7 @@ namespace MeteorInstaller.ui.shop.addon
                     
                     var discord = links.discord; // check for discord link
                     if (discord != null) _addon.discordLink = discord.ToString();
-
-                    //MessageBox.Show("discord check OK.");
+                    
 
                     var download = links.download; // set download link
                     if (download == null)
@@ -308,9 +302,6 @@ namespace MeteorInstaller.ui.shop.addon
                     _addon.repoUrl = github.ToString();
                     _addon.downloadUrl = download.ToString();
                     _addon.fileName = _addon.downloadUrl.Split('/').Last();
-
-                    //MessageBox.Show("download link OK.");
-
                     _addons.Add(_addon);
                 }
                 catch (Exception e)
