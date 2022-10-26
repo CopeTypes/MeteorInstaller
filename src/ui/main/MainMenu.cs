@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MeteorInstaller.ui.installer;
@@ -56,7 +57,6 @@ namespace MeteorInstaller.ui.main
 
         private void Form1_Shown(object sender, EventArgs e)
         {
-            if (!Config.load()) return;
             customFolder.Visible = Config._config.customModDir;
             customFolder.Text = Config._config.modFolderPath;
             skipLauncherCheck.Checked = Config._config.skipLauncherCheck;
@@ -88,6 +88,7 @@ namespace MeteorInstaller.ui.main
         private void MainMenu_Load(object sender, EventArgs e)
         {
             Utils.setVers();
+            Config.load();
             install_release.Text += " (" + Utils.releaseMc + ")";
             install_dev.Text += " (" + Utils.devMc + ")";
         }

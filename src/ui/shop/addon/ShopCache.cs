@@ -22,7 +22,6 @@ namespace MeteorInstaller.ui.shop.addon
 
         private static void organize()
         {
-            //todo rewrite
             List<MeteorAddon> latest = new List<MeteorAddon>();
             List<MeteorAddon> others = new List<MeteorAddon>();
             foreach (var addon in addonCache)
@@ -38,13 +37,6 @@ namespace MeteorInstaller.ui.shop.addon
             organized.AddRange(others.OrderBy(addon => addon.downloads).Reverse().ToList());
             addonCache.Clear();
             addonCache.AddRange(organized.Distinct());
-        }
-        
-        
-        
-        public static void cacheAllIcons()
-        {
-            foreach (var addon in addonCache) cacheIcon(addon);
         }
         
         public static bool cacheIcon(MeteorAddon addon)

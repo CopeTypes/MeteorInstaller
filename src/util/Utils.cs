@@ -6,8 +6,10 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using MeteorInstaller.ui.shop.addon;
 using Newtonsoft.Json;
+using Octokit;
 
 namespace MeteorInstaller.util
 {
@@ -28,7 +30,12 @@ namespace MeteorInstaller.util
 
         public static async void sysLog(string s)
         {
-            if (!File.Exists(logpath)) using (StreamWriter w = File.CreateText(logpath)) await w.WriteLineAsync("MeteorInstaller log");
+            if (!File.Exists(logpath))
+                using (StreamWriter w = File.CreateText(logpath))
+                {
+                    await w.WriteLineAsync("MeteorInstaller log");
+                    await w.WriteLineAsync(s);
+                }
             else using (StreamWriter w2 = File.AppendText(logpath)) await w2.WriteLineAsync(s);
         }
         
@@ -70,6 +77,7 @@ namespace MeteorInstaller.util
 
         public static bool javaCheck()
         {
+            //return false; for testing
             string ver = getJavaVer();
             if (string.IsNullOrEmpty(ver)) return false;
             return ver.Contains("17") || ver.Contains("18") || ver.Contains("19");

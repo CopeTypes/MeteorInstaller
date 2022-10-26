@@ -11,5 +11,6 @@
         public bool scrapeAnticope { get; set; }
         
         
+        public string javaDLUrl { get; set; }
     }
 }

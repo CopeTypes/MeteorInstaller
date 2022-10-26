@@ -17,6 +17,8 @@ using Octokit;
 namespace MeteorInstaller.ui.shop.addon
 {
     
+    //todo store when we last scraped github/anticope.ml, automatically re-scrape weekly
+    
     public partial class AddonShopUI : Form
     {
         public AddonShopUI()
@@ -68,15 +70,12 @@ namespace MeteorInstaller.ui.shop.addon
                 loaded = true;
             }
 
-            if (Config.load())
+            scrapeGithub.Checked = Config._config.scrapeGithub;
+            scrapeAntiCope.Checked = Config._config.scrapeAnticope;
+            if (!loaded)
             {
-                scrapeGithub.Checked = Config._config.scrapeGithub;
-                scrapeAntiCope.Checked = Config._config.scrapeAnticope;
-                if (!loaded)
-                {
-                    if (scrapeAntiCope.Checked) loaded = updateFromAntiCope();
-                    if (scrapeGithub.Checked && !loaded) loaded = updateFromGithub();
-                }
+                if (scrapeAntiCope.Checked) loaded = updateFromAntiCope();
+                if (scrapeGithub.Checked && !loaded) loaded = updateFromGithub();
             }
             if (loaded) reloadShop();
             else MessageBox.Show("Unable to load the shop! Please try updating later.");
