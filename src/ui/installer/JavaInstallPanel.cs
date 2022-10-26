@@ -94,7 +94,12 @@ namespace MeteorInstaller.ui.installer
         {
             try
             {
-                IReadOnlyList<Release> releases = GithubUtils.ghClient.Repository.Release.GetAll("adoptium", "temurin17-binaries").GetAwaiter().GetResult();
+                ApiOptions apiOptions = new ApiOptions()
+                {
+                    PageCount = 1,
+                    PageSize = 2
+                };
+                IReadOnlyList<Release> releases = GithubUtils.ghClient.Repository.Release.GetAll("adoptium", "temurin17-binaries", apiOptions).GetAwaiter().GetResult();
                 ReleaseAsset goodAsset = null;
                 foreach (var rel in releases)
                 {
